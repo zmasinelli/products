@@ -1,8 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Products.Api.Data;
-using Products.Api.Models;
 using Products.Api.Models.DTOs;
+using Products.Api.Services;
 
 namespace Products.Api.Controllers;
 
@@ -10,28 +8,18 @@ namespace Products.Api.Controllers;
 [Route("api/[controller]")]
 public class CategoriesController : ControllerBase
 {
-    private readonly ApplicationDbContext _context;
+    private readonly ICategoryService _categoryService;
 
-    public CategoriesController(ApplicationDbContext context)
+    public CategoriesController(ICategoryService categoryService)
     {
-        _context = context;
+        _categoryService = categoryService;
     }
 
     // GET: api/categories
     [HttpGet]
     public async Task<ActionResult<IEnumerable<CategoryDto>>> GetCategories()
     {
-        var categories = await _context.Categories
-            .Where(c => c.IsActive)
-            .Select(c => new CategoryDto
-            {
-                Id = c.Id,
-                Name = c.Name,
-                Description = c.Description,
-                IsActive = c.IsActive
-            })
-            .ToListAsync();
-
+        var categories = await _categoryService.GetCategoriesAsync();
         return Ok(categories);
     }
 
@@ -41,30 +29,18 @@ public class CategoriesController : ControllerBase
     {
         if (!ModelState.IsValid)
         {
-            return BadRequest(ModelState);
+            return BadRequest(new ErrorResponseDto
+            {
+                Message = "Validation failed",
+                Errors = ModelState
+                    .Where(x => x.Value?.Errors.Count > 0)
+                    .ToDictionary(
+                        kvp => kvp.Key,
+                        kvp => kvp.Value!.Errors.Select(e => e.ErrorMessage).ToArray())
+            });
         }
 
-        var category = new Category
-        {
-            Name = createDto.Name,
-            Description = createDto.Description,
-            IsActive = true
-        };
-
-        _context.Categories.Add(category);
-        await _context.SaveChangesAsync();
-
-        var categoryDto = new CategoryDto
-        {
-            Id = category.Id,
-            Name = category.Name,
-            Description = category.Description,
-            IsActive = category.IsActive
-        };
-
+        var categoryDto = await _categoryService.CreateCategoryAsync(createDto);
         return CreatedAtAction(nameof(GetCategories), categoryDto);
     }
 }
-
-
-

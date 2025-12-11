@@ -98,7 +98,7 @@ public class ApplicationDbContext : DbContext
             // Check constraints
             entity.ToTable(t =>
             {
-                t.HasCheckConstraint("CK_Product_Price_NonNegative", "\"price\" >= 0");
+                t.HasCheckConstraint("CK_Product_Price_Positive", "\"price\" > 0");
                 t.HasCheckConstraint("CK_Product_StockQuantity_NonNegative", "\"stock_quantity\" >= 0");
             });
         });

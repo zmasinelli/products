@@ -22,6 +22,23 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 
+// Configure CORS
+var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() 
+    ?? (builder.Environment.IsDevelopment() 
+        ? new[] { "http://localhost:4200" } 
+        : Array.Empty<string>());
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AngularApp", policy =>
+    {
+        policy.WithOrigins(allowedOrigins)
+              .AllowAnyMethod()
+              .AllowAnyHeader()
+              .AllowCredentials();
+    });
+});
+
 var app = builder.Build();
 
 // Seed database
@@ -48,6 +65,9 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+// CORS middleware (must be before UseAuthorization)
+app.UseCors("AngularApp");
 
 // Global exception handling middleware (must be early in pipeline)
 app.UseMiddleware<GlobalExceptionHandlerMiddleware>();

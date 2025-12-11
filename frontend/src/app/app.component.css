@@ -1,0 +1,15 @@
+main {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: calc(var(--spacing-unit) * 3);
+}
+
+header {
+  margin-bottom: calc(var(--spacing-unit) * 4);
+}
+
+h1 {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 600;
+}

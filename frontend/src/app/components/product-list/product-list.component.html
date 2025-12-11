@@ -1,0 +1,31 @@
+<div *ngIf="state$ | async as state">
+  <div *ngIf="state.isLoading" class="loading">Loading...</div>
+  
+  <div *ngIf="state.error" class="error" role="alert" aria-live="polite">
+    {{ state.error }}
+  </div>
+
+  <table *ngIf="!state.isLoading && !state.error && state.products.length > 0" aria-label="Products list">
+    <caption>Products</caption>
+    <thead>
+      <tr>
+        <th scope="col">Name</th>
+        <th scope="col">Price</th>
+        <th scope="col">Category</th>
+        <th scope="col">Stock Quantity</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let product of state.products">
+        <td>{{ product.name }}</td>
+        <td>{{ product.price | currency:'USD':'symbol':'1.2-2' }}</td>
+        <td>{{ product.categoryName }}</td>
+        <td>{{ product.stockQuantity }}</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div *ngIf="!state.isLoading && !state.error && state.products.length === 0" class="empty">
+    No products available.
+  </div>
+</div>

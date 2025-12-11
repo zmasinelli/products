@@ -52,3 +52,6 @@ CREATE INDEX idx_product_stock_quantity ON product(stock_quantity) WHERE stock_q
 -- Composite index for active products sorted by price
 CREATE INDEX idx_product_active_price ON product(is_active, price) WHERE is_active = true;
 
+
+
+

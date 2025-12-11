@@ -244,3 +244,6 @@ WHERE stock_quantity > 0 AND stock_quantity < 10;
 3. **Foreign Key Constraint**: `ON DELETE RESTRICT` prevents orphaned products; `ON UPDATE CASCADE` maintains referential integrity
 4. **Check Constraints**: Ensure data integrity (non-negative price and stock)
 5. **Default Values**: `is_active` defaults to `true`, timestamps default to current time
+
+
+

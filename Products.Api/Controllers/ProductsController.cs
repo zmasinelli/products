@@ -41,6 +41,117 @@ public class ProductsController : ControllerBase
         return Ok(products);
     }
 
+    // GET: api/products/search
+    [HttpGet("search")]
+    public async Task<ActionResult<SearchProductsResponseDto>> SearchProducts(
+        [FromQuery] string? searchTerm = null,
+        [FromQuery] int? categoryId = null,
+        [FromQuery] decimal? minPrice = null,
+        [FromQuery] decimal? maxPrice = null,
+        [FromQuery] bool? inStock = null,
+        [FromQuery] string? sortBy = null,
+        [FromQuery] string? sortOrder = null,
+        [FromQuery] int pageNumber = 1,
+        [FromQuery] int pageSize = 10)
+    {
+        // Build base query - only active products
+        var query = _context.Products
+            .Where(p => p.IsActive)
+            .Include(p => p.Category)
+            .AsQueryable();
+
+        // Apply searchTerm filter with AND logic
+        if (!string.IsNullOrWhiteSpace(searchTerm))
+        {
+            var searchWords = searchTerm.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+            foreach (var word in searchWords)
+            {
+                var searchPattern = $"%{word}%";
+                query = query.Where(p =>
+                    EF.Functions.ILike(p.Name, searchPattern) ||
+                    (p.Description != null && EF.Functions.ILike(p.Description, searchPattern)));
+            }
+        }
+
+        // Apply categoryId filter
+        if (categoryId.HasValue)
+        {
+            query = query.Where(p => p.CategoryId == categoryId.Value);
+        }
+
+        // Apply price range filters
+        if (minPrice.HasValue)
+        {
+            query = query.Where(p => p.Price >= minPrice.Value);
+        }
+
+        if (maxPrice.HasValue)
+        {
+            query = query.Where(p => p.Price <= maxPrice.Value);
+        }
+
+        // Apply inStock filter
+        if (inStock.HasValue)
+        {
+            if (inStock.Value)
+            {
+                query = query.Where(p => p.StockQuantity > 0);
+            }
+            else
+            {
+                query = query.Where(p => p.StockQuantity == 0);
+            }
+        }
+
+        // Apply sorting
+        sortOrder = sortOrder?.ToLower() ?? "asc";
+        var isDescending = sortOrder == "desc";
+
+        query = (sortBy?.ToLower()) switch
+        {
+            "name" => isDescending ? query.OrderByDescending(p => p.Name) : query.OrderBy(p => p.Name),
+            "price" => isDescending ? query.OrderByDescending(p => p.Price) : query.OrderBy(p => p.Price),
+            "createddate" => isDescending ? query.OrderByDescending(p => p.CreatedDate) : query.OrderBy(p => p.CreatedDate),
+            _ => query.OrderBy(p => p.Id) // Default sort
+        };
+
+        // Get total count before pagination
+        var totalCount = await query.CountAsync();
+
+        // Apply pagination
+        var skip = (pageNumber - 1) * pageSize;
+        var items = await query
+            .Skip(skip)
+            .Take(pageSize)
+            .Select(p => new ProductDto
+            {
+                Id = p.Id,
+                Name = p.Name,
+                Description = p.Description,
+                Price = p.Price,
+                CategoryId = p.CategoryId,
+                CategoryName = p.Category.Name,
+                StockQuantity = p.StockQuantity,
+                CreatedDate = p.CreatedDate,
+                IsActive = p.IsActive
+            })
+            .ToListAsync();
+
+        // Calculate total pages
+        var totalPages = (int)Math.Ceiling(totalCount / (double)pageSize);
+
+        var response = new SearchProductsResponseDto
+        {
+            Items = items,
+            TotalCount = totalCount,
+            PageNumber = pageNumber,
+            PageSize = pageSize,
+            TotalPages = totalPages
+        };
+
+        return Ok(response);
+    }
+
     // GET: api/products/5
     [HttpGet("{id}")]
     public async Task<ActionResult<ProductDto>> GetProduct(int id)

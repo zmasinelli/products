@@ -146,7 +146,7 @@ public class ProductService : IProductService
     public async Task<ProductDto?> GetProductByIdAsync(int id)
     {
         return await _context.Products
-            .Where(p => p.Id == id && p.IsActive)
+            .Where(p => p.Id == id)
             .Include(p => p.Category)
             .AsNoTracking()
             .Select(p => new ProductDto
@@ -206,7 +206,7 @@ public class ProductService : IProductService
     public async Task<bool> UpdateProductAsync(int id, UpdateProductDto updateDto)
     {
         var product = await _context.Products
-            .FirstOrDefaultAsync(p => p.Id == id && p.IsActive);
+            .FirstOrDefaultAsync(p => p.Id == id);
 
         if (product == null)
         {
@@ -247,6 +247,11 @@ public class ProductService : IProductService
         if (updateDto.StockQuantity.HasValue)
         {
             product.StockQuantity = updateDto.StockQuantity.Value;
+        }
+
+        if (updateDto.IsActive.HasValue)
+        {
+            product.IsActive = updateDto.IsActive.Value;
         }
 
         try

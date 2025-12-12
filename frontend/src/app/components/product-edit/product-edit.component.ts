@@ -33,7 +33,8 @@ export class ProductEditComponent {
     description: [''],
     price: [null, [Validators.required, Validators.min(0.01)]],
     categoryId: [null, [Validators.required]],
-    stockQuantity: [0, [Validators.min(0)]]
+    stockQuantity: [0, [Validators.min(0)]],
+    isActive: [true]
   });
 
   isSubmitting = false;
@@ -73,7 +74,8 @@ export class ProductEditComponent {
           description: product.description || '',
           price: product.price,
           categoryId: product.categoryId,
-          stockQuantity: product.stockQuantity
+          stockQuantity: product.stockQuantity,
+          isActive: product.isActive
         });
       }
     });
@@ -114,7 +116,8 @@ export class ProductEditComponent {
       description: formValue.description || null,
       price: formValue.price,
       categoryId: formValue.categoryId,
-      stockQuantity: formValue.stockQuantity || 0
+      stockQuantity: formValue.stockQuantity || 0,
+      isActive: formValue.isActive
     };
 
     this.productService.updateProduct(this.productId, product).subscribe({

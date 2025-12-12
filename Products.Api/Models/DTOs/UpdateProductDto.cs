@@ -16,6 +16,8 @@ public class UpdateProductDto
 
     [Range(0, int.MaxValue, ErrorMessage = "Stock quantity must be non-negative")]
     public int? StockQuantity { get; set; }
+
+    public bool? IsActive { get; set; }
 }
 
 

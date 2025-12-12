@@ -32,4 +32,5 @@ export interface UpdateProductRequest {
   price?: number;
   categoryId?: number;
   stockQuantity?: number;
+  isActive?: boolean;
 }

@@ -328,29 +328,17 @@ Indexes were designed based on query patterns identified in the API endpoints:
    - **Optimization**: Use EF Core's `GroupBy()` or raw SQL for efficient aggregations
    - **Caching**: Consider caching category summaries since they change infrequently
 
-2. **Full-Text Search**
-   - **Approach**: Implement PostgreSQL full-text search with `tsvector` and `tsquery`
-   - **Benefits**: Better relevance ranking and performance for large text searches
-   - **Migration**: Add full-text search columns and indexes to Product table
-
-3. **Product Image Support**
+2. **Product Image Support**
    - **Approach**: Add `ImageUrl` field to Product entity, store images in cloud storage (S3/Azure Blob)
    - **API**: Add image upload endpoint with validation and resizing
 
-4. **Audit Logging**
+3. **Audit Logging**
    - **Approach**: Implement audit trail for product changes (who, when, what changed)
    - **Pattern**: Use EF Core interceptors or shadow properties to track changes
 
-5. **Bulk Operations**
+4. **Bulk Operations**
    - **Approach**: Add endpoints for bulk create/update/delete operations
    - **Optimization**: Use `AddRange()` and batch processing for performance
-
-6. **Advanced Frontend Features**
-   - Product creation/edit forms with validation
-   - Real-time search with debouncing
-   - Category filtering UI
-   - Product details view with full information
-   - Error handling and loading states
 
 ### Refactoring Priorities
 
@@ -368,11 +356,105 @@ Indexes were designed based on query patterns identified in the API endpoints:
    - **Current**: Services return DTOs or throw exceptions
    - **Improvement**: Implement Result<T> pattern for explicit error handling
    - **Benefit**: Makes error cases explicit in method signatures
+   
+   **Example Implementation:**
+   ```csharp
+   // Current: throws exception
+   public async Task<ProductDto> GetProductAsync(int id)
+   {
+       var product = await _context.Products.FindAsync(id);
+       if (product == null) throw new NotFoundException("Product not found");
+       return MapToDto(product);
+   }
+   
+   // With Result Pattern: explicit error handling
+   public async Task<Result<ProductDto>> GetProductAsync(int id)
+   {
+       var product = await _context.Products.FindAsync(id);
+       if (product == null) 
+           return Result<ProductDto>.Failure("Product not found");
+       return Result<ProductDto>.Success(MapToDto(product));
+   }
+   
+   // Result<T> implementation
+   public class Result<T>
+   {
+       public bool IsSuccess { get; }
+       public T Value { get; }
+       public string Error { get; }
+       
+       private Result(T value) { IsSuccess = true; Value = value; }
+       private Result(string error) { IsSuccess = false; Error = error; }
+       
+       public static Result<T> Success(T value) => new Result<T>(value);
+       public static Result<T> Failure(string error) => new Result<T>(error);
+   }
+   ```
 
 4. **Specification Pattern**
    - **Current**: Query building logic in service methods
    - **Improvement**: Extract query specifications to separate classes
    - **Benefit**: Reusable, testable query logic
+   
+   **Example Implementation:**
+   ```csharp
+   // Current: query logic in service
+   public async Task<List<ProductDto>> SearchProductsAsync(string searchTerm, int? categoryId)
+   {
+       var query = _context.Products.Where(p => p.IsActive);
+       if (!string.IsNullOrEmpty(searchTerm))
+           query = query.Where(p => p.Name.Contains(searchTerm));
+       if (categoryId.HasValue)
+           query = query.Where(p => p.CategoryId == categoryId.Value);
+       return await query.Select(p => MapToDto(p)).ToListAsync();
+   }
+   
+   // With Specification Pattern: reusable query classes
+   public interface ISpecification<T>
+   {
+       IQueryable<T> Apply(IQueryable<T> query);
+   }
+   
+   public class ActiveProductsSpecification : ISpecification<Product>
+   {
+       public IQueryable<Product> Apply(IQueryable<Product> query)
+           => query.Where(p => p.IsActive);
+   }
+   
+   public class ProductNameContainsSpecification : ISpecification<Product>
+   {
+       private readonly string _searchTerm;
+       public ProductNameContainsSpecification(string searchTerm) 
+           => _searchTerm = searchTerm;
+       
+       public IQueryable<Product> Apply(IQueryable<Product> query)
+           => query.Where(p => p.Name.Contains(_searchTerm));
+   }
+   
+   public class ProductCategorySpecification : ISpecification<Product>
+   {
+       private readonly int _categoryId;
+       public ProductCategorySpecification(int categoryId) 
+           => _categoryId = categoryId;
+       
+       public IQueryable<Product> Apply(IQueryable<Product> query)
+           => query.Where(p => p.CategoryId == _categoryId);
+   }
+   
+   // Usage in service
+   public async Task<List<ProductDto>> SearchProductsAsync(string searchTerm, int? categoryId)
+   {
+       var query = _context.Products.AsQueryable();
+       query = new ActiveProductsSpecification().Apply(query);
+       
+       if (!string.IsNullOrEmpty(searchTerm))
+           query = new ProductNameContainsSpecification(searchTerm).Apply(query);
+       if (categoryId.HasValue)
+           query = new ProductCategorySpecification(categoryId.Value).Apply(query);
+       
+       return await query.Select(p => MapToDto(p)).ToListAsync();
+   }
+   ```
 
 5. **Unit Tests**
    - **Priority**: Add comprehensive unit tests for services using in-memory database

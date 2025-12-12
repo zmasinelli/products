@@ -1,4 +1,4 @@
-# Products Project
+# ProdCats
 
 A product management system with PostgreSQL database, .NET Web API backend, and Angular frontend.
 

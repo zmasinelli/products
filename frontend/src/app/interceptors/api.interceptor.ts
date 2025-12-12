@@ -5,7 +5,7 @@ import { ErrorResponse } from '../models/error-response.model';
 
 export const apiInterceptor: HttpInterceptorFn = (req, next) => {
   // Clone request and prepend base URL to relative URLs
-  const apiUrl = environment.apiUrl;
+  const apiUrl = environment.apiUrl || 'http://localhost:5292';
   let apiReq = req;
 
   if (!req.url.startsWith('http://') && !req.url.startsWith('https://')) {

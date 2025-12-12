@@ -1,0 +1,41 @@
+<div *ngIf="state$ | async as state">
+  <div class="header">
+    <h1>Categories</h1>
+    <a routerLink="/categories/new" class="btn btn-primary">Create Category</a>
+  </div>
+
+  <div *ngIf="state.isLoading" class="loading">Loading...</div>
+  
+  <div *ngIf="state.error" class="error" role="alert" aria-live="polite">
+    {{ state.error }}
+  </div>
+
+  <div *ngIf="!state.isLoading && !state.error && state.categories.length > 0" class="results-info">
+    Showing {{ state.categories.length }} categories
+  </div>
+
+  <table *ngIf="!state.isLoading && !state.error && state.categories.length > 0" aria-label="Categories list">
+    <thead>
+      <tr>
+        <th scope="col">Name</th>
+        <th scope="col">Description</th>
+        <th scope="col">Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let category of state.categories" [routerLink]="['/categories', category.id, 'edit']" class="clickable-row">
+        <td>{{ category.name }}</td>
+        <td>{{ category.description || '-' }}</td>
+        <td>
+          <span [class.active]="category.isActive" [class.inactive]="!category.isActive">
+            {{ category.isActive ? 'Active' : 'Inactive' }}
+          </span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div *ngIf="!state.isLoading && !state.error && state.categories.length === 0" class="empty">
+    No categories found.
+  </div>
+</div>

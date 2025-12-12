@@ -1,4 +1,0 @@
-{"location":"product.service.ts:15","message":"getProducts called","data":{"apiUrl":"/api/products"},"timestamp":1765504550024,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
-{"location":"api.interceptor.ts:6","message":"Interceptor entry","data":{"originalUrl":"/api/products","apiUrl":"http://localhost:5292","resolvedApiUrl":"http://localhost:5292"},"timestamp":1765504550026,"sessionId":"debug-session","runId":"run1","hypothesisId":"B"}
-{"location":"api.interceptor.ts:13","message":"URL transformed","data":{"originalUrl":"/api/products","transformedUrl":"http://localhost:5292/api/products"},"timestamp":1765504550027,"sessionId":"debug-session","runId":"run1","hypothesisId":"B"}
-{"location":"product.service.ts:15","message":"getProducts called","data":{"apiUrl":"/api/products"},"timestamp":1765504574390,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}

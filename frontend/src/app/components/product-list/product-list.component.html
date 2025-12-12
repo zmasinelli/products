@@ -1,7 +1,10 @@
 <div *ngIf="state$ | async as state">
   <div class="header">
     <h1>Products</h1>
-    <a routerLink="/products/new" class="btn btn-primary">Create Product</a>
+    <div class="header-actions">
+      <a routerLink="/categories/new" class="btn btn-secondary">Create Category</a>
+      <a routerLink="/products/new" class="btn btn-primary">Create Product</a>
+    </div>
   </div>
 
   <div class="filters" [formGroup]="filterForm">

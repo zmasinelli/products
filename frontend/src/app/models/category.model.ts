@@ -4,3 +4,14 @@ export interface Category {
   description: string | null;
   isActive: boolean;
 }
+
+export interface CreateCategoryRequest {
+  name: string;
+  description?: string | null;
+}
+
+export interface UpdateCategoryRequest {
+  name?: string;
+  description?: string | null;
+  isActive?: boolean;
+}

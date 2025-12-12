@@ -23,6 +23,20 @@ public class CategoriesController : ControllerBase
         return Ok(categories);
     }
 
+    // GET: api/categories/5
+    [HttpGet("{id}")]
+    public async Task<ActionResult<CategoryDto>> GetCategory(int id)
+    {
+        var category = await _categoryService.GetCategoryByIdAsync(id);
+
+        if (category == null)
+        {
+            return NotFound();
+        }
+
+        return Ok(category);
+    }
+
     // POST: api/categories
     [HttpPost]
     public async Task<ActionResult<CategoryDto>> CreateCategory(CreateCategoryDto createDto)
@@ -41,6 +55,33 @@ public class CategoriesController : ControllerBase
         }
 
         var categoryDto = await _categoryService.CreateCategoryAsync(createDto);
-        return CreatedAtAction(nameof(GetCategories), categoryDto);
+        return CreatedAtAction(nameof(GetCategory), new { id = categoryDto.Id }, categoryDto);
+    }
+
+    // PUT: api/categories/5
+    [HttpPut("{id}")]
+    public async Task<IActionResult> UpdateCategory(int id, UpdateCategoryDto updateDto)
+    {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(new ErrorResponseDto
+            {
+                Message = "Validation failed",
+                Errors = ModelState
+                    .Where(x => x.Value?.Errors.Count > 0)
+                    .ToDictionary(
+                        kvp => kvp.Key,
+                        kvp => kvp.Value!.Errors.Select(e => e.ErrorMessage).ToArray())
+            });
+        }
+
+        var updated = await _categoryService.UpdateCategoryAsync(id, updateDto);
+
+        if (!updated)
+        {
+            return NotFound();
+        }
+
+        return NoContent();
     }
 }

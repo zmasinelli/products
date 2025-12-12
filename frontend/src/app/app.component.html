@@ -6,6 +6,10 @@
         {{ title }}
       </a>
     </h1>
+    <nav class="main-nav">
+      <a routerLink="/products" routerLinkActive="active" [routerLinkActiveOptions]="{exact: false}">Products</a>
+      <a routerLink="/categories" routerLinkActive="active" [routerLinkActiveOptions]="{exact: false}">Categories</a>
+    </nav>
   </header>
   <router-outlet></router-outlet>
 </main>

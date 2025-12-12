@@ -29,6 +29,26 @@ public class CategoryService : ICategoryService
             .ToListAsync();
     }
 
+    public async Task<CategoryDto?> GetCategoryByIdAsync(int id)
+    {
+        var category = await _context.Categories
+            .AsNoTracking()
+            .FirstOrDefaultAsync(c => c.Id == id);
+
+        if (category == null)
+        {
+            return null;
+        }
+
+        return new CategoryDto
+        {
+            Id = category.Id,
+            Name = category.Name,
+            Description = category.Description,
+            IsActive = category.IsActive
+        };
+    }
+
     public async Task<CategoryDto> CreateCategoryAsync(CreateCategoryDto createDto)
     {
         var category = new Category
@@ -48,5 +68,33 @@ public class CategoryService : ICategoryService
             Description = category.Description,
             IsActive = category.IsActive
         };
+    }
+
+    public async Task<bool> UpdateCategoryAsync(int id, UpdateCategoryDto updateDto)
+    {
+        var category = await _context.Categories.FindAsync(id);
+
+        if (category == null)
+        {
+            return false;
+        }
+
+        if (updateDto.Name != null)
+        {
+            category.Name = updateDto.Name;
+        }
+
+        if (updateDto.Description != null)
+        {
+            category.Description = updateDto.Description;
+        }
+
+        if (updateDto.IsActive.HasValue)
+        {
+            category.IsActive = updateDto.IsActive.Value;
+        }
+
+        await _context.SaveChangesAsync();
+        return true;
     }
 }

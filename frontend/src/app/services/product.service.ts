@@ -80,6 +80,9 @@ export class ProductService {
   }
 
   updateProduct(id: number, product: UpdateProductRequest): Observable<void> {
+    // #region agent log
+    fetch('http://127.0.0.1:7242/ingest/acf325a0-3256-4a55-9d83-c6c0009382cd',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'product.service.ts:82',message:'HTTP PUT request being sent',data:{id,product,isActiveInRequest:product.isActive,requestBody:JSON.stringify(product)},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'})}).catch(()=>{});
+    // #endregion
     return this.http.put<void>(`${this.apiUrl}/${id}`, product).pipe(
       catchError(this.handleError)
     );

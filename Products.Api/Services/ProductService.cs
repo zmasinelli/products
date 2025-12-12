@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Products.Api.Data;
 using Products.Api.Models;
 using Products.Api.Models.DTOs;
+using System.Text.Json;
 
 namespace Products.Api.Services;
 
@@ -213,6 +214,14 @@ public class ProductService : IProductService
             return false;
         }
 
+        // #region agent log
+        var initialIsActive = product.IsActive;
+        try {
+            var logData = System.Text.Json.JsonSerializer.Serialize(new { location = "ProductService.cs:217", message = "UpdateProductAsync entry - product loaded from DB", data = new { id, productIsActiveBefore = initialIsActive, updateDtoIsActive = updateDto.IsActive, updateDtoIsActiveHasValue = updateDto.IsActive.HasValue, updateDtoIsActiveValue = updateDto.IsActive.HasValue ? updateDto.IsActive.Value : (bool?)null }, timestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(), sessionId = "debug-session", runId = "run1", hypothesisId = "C" }) + "\n";
+            System.IO.File.AppendAllText("/Users/zac/dev/products/.cursor/debug.log", logData);
+        } catch {}
+        // #endregion
+
         // Validate category if provided
         if (updateDto.CategoryId.HasValue)
         {
@@ -249,14 +258,42 @@ public class ProductService : IProductService
             product.StockQuantity = updateDto.StockQuantity.Value;
         }
 
+        // #region agent log
+        try {
+            var logData = System.Text.Json.JsonSerializer.Serialize(new { location = "ProductService.cs:258", message = "Before IsActive update check", data = new { id, updateDtoIsActiveHasValue = updateDto.IsActive.HasValue, updateDtoIsActiveValue = updateDto.IsActive.HasValue ? updateDto.IsActive.Value : (bool?)null, productIsActiveBefore = product.IsActive }, timestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(), sessionId = "debug-session", runId = "run1", hypothesisId = "C" }) + "\n";
+            System.IO.File.AppendAllText("/Users/zac/dev/products/.cursor/debug.log", logData);
+        } catch {}
+        // #endregion
         if (updateDto.IsActive.HasValue)
         {
             product.IsActive = updateDto.IsActive.Value;
+            // #region agent log
+            try {
+                var logData = System.Text.Json.JsonSerializer.Serialize(new { location = "ProductService.cs:263", message = "IsActive updated on product entity", data = new { id, productIsActiveAfter = product.IsActive, updateDtoIsActiveValue = updateDto.IsActive.Value }, timestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(), sessionId = "debug-session", runId = "run1", hypothesisId = "D" }) + "\n";
+                System.IO.File.AppendAllText("/Users/zac/dev/products/.cursor/debug.log", logData);
+            } catch {}
+            // #endregion
+        }
+        else
+        {
+            // #region agent log
+            try {
+                var logData = System.Text.Json.JsonSerializer.Serialize(new { location = "ProductService.cs:268", message = "IsActive NOT updated - HasValue is false", data = new { id, updateDtoIsActiveHasValue = updateDto.IsActive.HasValue, productIsActiveUnchanged = product.IsActive }, timestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(), sessionId = "debug-session", runId = "run1", hypothesisId = "C" }) + "\n";
+                System.IO.File.AppendAllText("/Users/zac/dev/products/.cursor/debug.log", logData);
+            } catch {}
+            // #endregion
         }
 
         try
         {
             await _context.SaveChangesAsync();
+            // #region agent log
+            try {
+                var productAfterSave = await _context.Products.AsNoTracking().FirstOrDefaultAsync(p => p.Id == id);
+                var logData = System.Text.Json.JsonSerializer.Serialize(new { location = "ProductService.cs:275", message = "Database save completed", data = new { id, productIsActiveAfterSave = productAfterSave?.IsActive, productIsActiveBeforeSave = initialIsActive }, timestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(), sessionId = "debug-session", runId = "run1", hypothesisId = "D" }) + "\n";
+                System.IO.File.AppendAllText("/Users/zac/dev/products/.cursor/debug.log", logData);
+            } catch {}
+            // #endregion
             return true;
         }
         catch (DbUpdateConcurrencyException)

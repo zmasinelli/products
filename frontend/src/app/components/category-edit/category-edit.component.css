@@ -3,7 +3,7 @@
   text-align: center;
 }
 
-.product-form {
+.category-form {
   max-width: 600px;
 }
 
@@ -95,12 +95,6 @@
   margin-top: calc(var(--spacing-unit) * 0.5);
 }
 
-.form-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: calc(var(--spacing-unit) * 2);
-}
-
 .form-actions {
   display: flex;
   gap: calc(var(--spacing-unit) * 2);
@@ -142,10 +136,6 @@
 }
 
 @media (max-width: 768px) {
-  .form-row {
-    grid-template-columns: 1fr;
-  }
-
   .form-actions {
     flex-direction: column;
   }

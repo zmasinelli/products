@@ -123,7 +123,13 @@ export class ProductEditComponent {
 
     this.productService.updateProduct(this.productId, product).subscribe({
       next: () => {
-        this.router.navigate(['/products', this.productId]);
+        // If product is being marked inactive, redirect to list page
+        // since inactive products won't be returned by the API
+        if (product.isActive === false) {
+          this.router.navigate(['/products']);
+        } else {
+          this.router.navigate(['/products', this.productId]);
+        }
       },
       error: (error) => {
         this.isSubmitting = false;

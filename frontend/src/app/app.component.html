@@ -1,6 +1,11 @@
 <main>
   <header>
-    <h1><a routerLink="/products">{{ title }}</a></h1>
+    <h1>
+      <a routerLink="/products">
+        <img src="assets/prodcats_icon.png" alt="ProdCats Icon" class="app-icon">
+        {{ title }}
+      </a>
+    </h1>
   </header>
   <router-outlet></router-outlet>
 </main>

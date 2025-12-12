@@ -23,3 +23,15 @@ h1 a {
 h1 a:hover {
   opacity: 0.8;
 }
+
+h1 a {
+  display: inline-flex;
+  align-items: center;
+  gap: calc(var(--spacing-unit) * 1);
+}
+
+.app-icon {
+  height: 48px;
+  width: 48px;
+  vertical-align: middle;
+}

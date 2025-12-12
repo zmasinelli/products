@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Products.Api.Models.DTOs;
 using Products.Api.Services;
-using System.Text.Json;
 
 namespace Products.Api.Controllers;
 
@@ -88,12 +87,6 @@ public class ProductsController : ControllerBase
     [HttpPut("{id}")]
     public async Task<IActionResult> UpdateProduct(int id, UpdateProductDto updateDto)
     {
-        // #region agent log
-        try {
-            var logData = System.Text.Json.JsonSerializer.Serialize(new { location = "ProductsController.cs:89", message = "UpdateProduct endpoint received request", data = new { id, updateDto = new { updateDto.Name, updateDto.Description, updateDto.Price, updateDto.CategoryId, updateDto.StockQuantity, IsActive = updateDto.IsActive, IsActiveHasValue = updateDto.IsActive.HasValue, IsActiveValue = updateDto.IsActive.HasValue ? updateDto.IsActive.Value : (bool?)null } }, timestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(), sessionId = "debug-session", runId = "run1", hypothesisId = "C" }) + "\n";
-            System.IO.File.AppendAllText("/Users/zac/dev/products/.cursor/debug.log", logData);
-        } catch {}
-        // #endregion
         if (!ModelState.IsValid)
         {
             return BadRequest(new ErrorResponseDto

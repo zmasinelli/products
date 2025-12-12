@@ -111,9 +111,6 @@ export class ProductEditComponent {
     this.error = null;
 
     const formValue = this.productForm.getRawValue();
-    // #region agent log
-    fetch('http://127.0.0.1:7242/ingest/acf325a0-3256-4a55-9d83-c6c0009382cd',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'product-edit.component.ts:113',message:'Form raw value before processing',data:{formValue,isActiveRaw:formValue.isActive,isActiveType:typeof formValue.isActive},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
-    // #endregion
     
     const product: UpdateProductRequest = {
       name: formValue.name,
@@ -123,21 +120,12 @@ export class ProductEditComponent {
       stockQuantity: formValue.stockQuantity || 0,
       isActive: Boolean(formValue.isActive)
     };
-    // #region agent log
-    fetch('http://127.0.0.1:7242/ingest/acf325a0-3256-4a55-9d83-c6c0009382cd',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'product-edit.component.ts:122',message:'UpdateProductRequest object created',data:{product,isActiveValue:product.isActive,productId:this.productId},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'})}).catch(()=>{});
-    // #endregion
 
     this.productService.updateProduct(this.productId, product).subscribe({
       next: () => {
-        // #region agent log
-        fetch('http://127.0.0.1:7242/ingest/acf325a0-3256-4a55-9d83-c6c0009382cd',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'product-edit.component.ts:127',message:'Update request succeeded',data:{productId:this.productId},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'D'})}).catch(()=>{});
-        // #endregion
         this.router.navigate(['/products', this.productId]);
       },
       error: (error) => {
-        // #region agent log
-        fetch('http://127.0.0.1:7242/ingest/acf325a0-3256-4a55-9d83-c6c0009382cd',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'product-edit.component.ts:131',message:'Update request failed',data:{error:error.message,productId:this.productId},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'D'})}).catch(()=>{});
-        // #endregion
         this.isSubmitting = false;
         this.error = error.message || 'Failed to update product';
       }

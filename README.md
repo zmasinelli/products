@@ -57,7 +57,7 @@ docker-compose down -v
 
 1. Navigate to the API directory:
    ```bash
-   cd Products.Api
+   cd ProdCats.Api
    ```
 
 2. Restore dependencies:
@@ -348,7 +348,7 @@ Indexes were designed based on query patterns identified in the API endpoints:
    - **Benefit**: Better scalability, easier to locate feature-specific code, clearer boundaries between features
    - **Target Structure**:
      ```
-     Products.Api/
+     ProdCats.Api/
      ├── Core/
      │   ├── Domain/ (Product.cs, Category.cs)
      │   ├── Data/ (ApplicationDbContext, DataSeeder)
@@ -597,7 +597,7 @@ Indexes were designed based on query patterns identified in the API endpoints:
 ## Project Structure
 
 - `migrations/` - Database schema migrations
-- `Products.Api/` - .NET 8.0 Web API backend
+- `ProdCats.Api/` - .NET 8.0 Web API backend
   - `Controllers/` - API endpoints
   - `Services/` - Business logic layer
   - `Models/` - Domain entities and DTOs
@@ -609,4 +609,4 @@ Indexes were designed based on query patterns identified in the API endpoints:
 ## Additional Documentation
 
 - See `migrations/README.md` for database schema documentation and migration instructions.
-- See `Products.Api/README.md` for detailed API endpoint documentation.
+- See `ProdCats.Api/README.md` for detailed API endpoint documentation.

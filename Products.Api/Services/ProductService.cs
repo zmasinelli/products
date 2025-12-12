@@ -146,7 +146,7 @@ public class ProductService : IProductService
     public async Task<ProductDto?> GetProductByIdAsync(int id)
     {
         return await _context.Products
-            .Where(p => p.Id == id)
+            .Where(p => p.Id == id && p.IsActive)
             .Include(p => p.Category)
             .AsNoTracking()
             .Select(p => new ProductDto

@@ -1,0 +1,103 @@
+<div *ngIf="product$ | async as product">
+  <div *ngIf="isLoading" class="loading">Loading...</div>
+  
+  <div *ngIf="error && !isLoading" class="error" role="alert" aria-live="polite">
+    {{ error }}
+  </div>
+
+  <div *ngIf="!isLoading && product" class="product-form">
+    <div class="header">
+      <h1>Edit Product</h1>
+      <a [routerLink]="['/products', productId]" class="btn btn-secondary">Cancel</a>
+    </div>
+
+    <form [formGroup]="productForm" (ngSubmit)="onSubmit()">
+      <div *ngIf="error" class="error" role="alert" aria-live="polite">
+        {{ error }}
+      </div>
+
+      <div class="form-group">
+        <label for="name">Name <span class="required">*</span></label>
+        <input 
+          id="name" 
+          type="text" 
+          formControlName="name" 
+          [class.invalid]="name?.invalid && name?.touched"
+        />
+        <div *ngIf="name?.invalid && name?.touched" class="error-message">
+          <span *ngIf="name?.errors?.['required']">Name is required</span>
+          <span *ngIf="name?.errors?.['maxlength']">Name must be 255 characters or less</span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="description">Description</label>
+        <textarea 
+          id="description" 
+          formControlName="description" 
+          rows="4"
+        ></textarea>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="price">Price <span class="required">*</span></label>
+          <input 
+            id="price" 
+            type="number" 
+            formControlName="price" 
+            step="0.01" 
+            min="0.01"
+            [class.invalid]="price?.invalid && price?.touched"
+          />
+          <div *ngIf="price?.invalid && price?.touched" class="error-message">
+            <span *ngIf="price?.errors?.['required']">Price is required</span>
+            <span *ngIf="price?.errors?.['min']">Price must be greater than 0</span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="stockQuantity">Stock Quantity</label>
+          <input 
+            id="stockQuantity" 
+            type="number" 
+            formControlName="stockQuantity" 
+            min="0"
+            [class.invalid]="stockQuantity?.invalid && stockQuantity?.touched"
+          />
+          <div *ngIf="stockQuantity?.invalid && stockQuantity?.touched" class="error-message">
+            <span *ngIf="stockQuantity?.errors?.['min']">Stock quantity must be 0 or greater</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="categoryId">Category <span class="required">*</span></label>
+        <select 
+          id="categoryId" 
+          formControlName="categoryId"
+          [class.invalid]="categoryId?.invalid && categoryId?.touched"
+        >
+          <option [value]="null">Select a category</option>
+          <option *ngFor="let category of categories$ | async" [value]="category.id">
+            {{ category.name }}
+          </option>
+        </select>
+        <div *ngIf="categoryId?.invalid && categoryId?.touched" class="error-message">
+          <span *ngIf="categoryId?.errors?.['required']">Category is required</span>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button 
+          type="submit" 
+          class="btn btn-primary" 
+          [disabled]="productForm.invalid || isSubmitting"
+        >
+          {{ isSubmitting ? 'Updating...' : 'Update Product' }}
+        </button>
+        <a [routerLink]="['/products', productId]" class="btn btn-secondary">Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>

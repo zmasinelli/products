@@ -1,12 +1,99 @@
 <div *ngIf="state$ | async as state">
+  <div class="header">
+    <h1>Products</h1>
+    <a routerLink="/products/new" class="btn btn-primary">Create Product</a>
+  </div>
+
+  <div class="filters" [formGroup]="filterForm">
+    <div class="filter-row">
+      <div class="filter-group">
+        <label for="searchTerm">Search</label>
+        <input 
+          id="searchTerm" 
+          type="text" 
+          formControlName="searchTerm" 
+          placeholder="Search by name or description"
+        />
+      </div>
+
+      <div class="filter-group">
+        <label for="categoryId">Category</label>
+        <select id="categoryId" formControlName="categoryId">
+          <option [ngValue]="null">All Categories</option>
+          <option *ngFor="let category of categories$ | async" [ngValue]="category.id">
+            {{ category.name }}
+          </option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label for="minPrice">Min Price</label>
+        <input 
+          id="minPrice" 
+          type="number" 
+          formControlName="minPrice" 
+          placeholder="0.00" 
+          min="0" 
+          step="0.01"
+        />
+      </div>
+
+      <div class="filter-group">
+        <label for="maxPrice">Max Price</label>
+        <input 
+          id="maxPrice" 
+          type="number" 
+          formControlName="maxPrice" 
+          placeholder="0.00" 
+          min="0" 
+          step="0.01"
+        />
+      </div>
+
+      <div class="filter-group">
+        <label for="inStock">In Stock</label>
+        <select id="inStock" formControlName="inStock">
+          <option [ngValue]="null">All</option>
+          <option [ngValue]="true">In Stock</option>
+          <option [ngValue]="false">Out of Stock</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label for="sortBy">Sort By</label>
+        <select id="sortBy" formControlName="sortBy">
+          <option value="">Default</option>
+          <option value="name">Name</option>
+          <option value="price">Price</option>
+          <option value="createdDate">Date Created</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label for="sortOrder">Order</label>
+        <select id="sortOrder" formControlName="sortOrder">
+          <option value="asc">Ascending</option>
+          <option value="desc">Descending</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <button type="button" class="btn btn-secondary" (click)="clearFilters()">Clear Filters</button>
+      </div>
+    </div>
+  </div>
+
   <div *ngIf="state.isLoading" class="loading">Loading...</div>
   
   <div *ngIf="state.error" class="error" role="alert" aria-live="polite">
     {{ state.error }}
   </div>
 
+  <div *ngIf="!state.isLoading && !state.error && state.totalCount > 0" class="results-info">
+    Showing {{ state.products.length }} of {{ state.totalCount }} products
+  </div>
+
   <table *ngIf="!state.isLoading && !state.error && state.products.length > 0" aria-label="Products list">
-    <caption>Products</caption>
     <thead>
       <tr>
         <th scope="col">Name</th>
@@ -16,7 +103,7 @@
       </tr>
     </thead>
     <tbody>
-      <tr *ngFor="let product of state.products">
+      <tr *ngFor="let product of state.products" [routerLink]="['/products', product.id]" class="clickable-row">
         <td>{{ product.name }}</td>
         <td>{{ product.price | currency:'USD':'symbol':'1.2-2' }}</td>
         <td>{{ product.categoryName }}</td>
@@ -26,6 +113,28 @@
   </table>
 
   <div *ngIf="!state.isLoading && !state.error && state.products.length === 0" class="empty">
-    No products available.
+    No products found.
+  </div>
+
+  <div *ngIf="!state.isLoading && !state.error && state.totalPages > 1" class="pagination">
+    <button 
+      type="button" 
+      class="btn btn-secondary" 
+      [disabled]="state.pageNumber === 1"
+      (click)="goToPage(state.pageNumber - 1, state)"
+    >
+      Previous
+    </button>
+    <span class="page-info">
+      Page {{ state.pageNumber }} of {{ state.totalPages }}
+    </span>
+    <button 
+      type="button" 
+      class="btn btn-secondary" 
+      [disabled]="state.pageNumber === state.totalPages"
+      (click)="goToPage(state.pageNumber + 1, state)"
+    >
+      Next
+    </button>
   </div>
 </div>

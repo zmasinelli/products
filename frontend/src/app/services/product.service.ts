@@ -1,9 +1,21 @@
 import { Injectable, inject } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError, shareReplay } from 'rxjs/operators';
-import { Product } from '../models/product.model';
+import { Product, SearchProductsResponse, CreateProductRequest, UpdateProductRequest } from '../models/product.model';
 import { HttpErrorResponse } from '@angular/common/http';
+
+export interface SearchProductsParams {
+  searchTerm?: string;
+  categoryId?: number;
+  minPrice?: number;
+  maxPrice?: number;
+  inStock?: boolean;
+  sortBy?: string;
+  sortOrder?: string;
+  pageNumber?: number;
+  pageSize?: number;
+}
 
 @Injectable({
   providedIn: 'root'
@@ -19,6 +31,66 @@ export class ProductService {
     );
   }
 
+  searchProducts(params: SearchProductsParams = {}): Observable<SearchProductsResponse> {
+    let httpParams = new HttpParams();
+    
+    if (params.searchTerm) {
+      httpParams = httpParams.set('searchTerm', params.searchTerm);
+    }
+    if (params.categoryId !== undefined && params.categoryId !== null) {
+      httpParams = httpParams.set('categoryId', params.categoryId.toString());
+    }
+    if (params.minPrice !== undefined) {
+      httpParams = httpParams.set('minPrice', params.minPrice.toString());
+    }
+    if (params.maxPrice !== undefined) {
+      httpParams = httpParams.set('maxPrice', params.maxPrice.toString());
+    }
+    if (params.inStock !== undefined && params.inStock !== null) {
+      httpParams = httpParams.set('inStock', params.inStock.toString());
+    }
+    if (params.sortBy) {
+      httpParams = httpParams.set('sortBy', params.sortBy);
+    }
+    if (params.sortOrder) {
+      httpParams = httpParams.set('sortOrder', params.sortOrder);
+    }
+    if (params.pageNumber !== undefined) {
+      httpParams = httpParams.set('pageNumber', params.pageNumber.toString());
+    }
+    if (params.pageSize !== undefined) {
+      httpParams = httpParams.set('pageSize', params.pageSize.toString());
+    }
+
+    return this.http.get<SearchProductsResponse>(`${this.apiUrl}/search`, { params: httpParams }).pipe(
+      catchError(this.handleError)
+    );
+  }
+
+  getProductById(id: number): Observable<Product> {
+    return this.http.get<Product>(`${this.apiUrl}/${id}`).pipe(
+      catchError(this.handleError)
+    );
+  }
+
+  createProduct(product: CreateProductRequest): Observable<Product> {
+    return this.http.post<Product>(this.apiUrl, product).pipe(
+      catchError(this.handleError)
+    );
+  }
+
+  updateProduct(id: number, product: UpdateProductRequest): Observable<void> {
+    return this.http.put<void>(`${this.apiUrl}/${id}`, product).pipe(
+      catchError(this.handleError)
+    );
+  }
+
+  deleteProduct(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/${id}`).pipe(
+      catchError(this.handleError)
+    );
+  }
+
   private handleError(error: HttpErrorResponse): Observable<never> {
     let errorMessage = 'An error occurred while fetching products.';
     
@@ -29,6 +101,10 @@ export class ProductService {
         errorMessage = (error.error as { message: string }).message;
       } else if (error.status === 0) {
         errorMessage = 'Unable to connect to the server. Please check your connection.';
+      } else if (error.status === 404) {
+        errorMessage = 'Product not found.';
+      } else if (error.status === 400) {
+        errorMessage = error.error?.message || 'Invalid request.';
       }
     }
 

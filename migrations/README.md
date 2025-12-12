@@ -208,35 +208,6 @@ This section documents all indexing decisions, their rationale, and performance 
 psql -U your_user -d your_database -f migrations/001_create_schema.sql
 ```
 
-### Common Queries
-
-**Get all active products in a category:**
-```sql
-SELECT * FROM product 
-WHERE category_id = 1 AND is_active = true;
-```
-
-**Get products sorted by price (active only):**
-```sql
-SELECT * FROM product 
-WHERE is_active = true 
-ORDER BY price;
-```
-
-**Get recently added products:**
-```sql
-SELECT * FROM product 
-WHERE is_active = true 
-ORDER BY created_date DESC 
-LIMIT 10;
-```
-
-**Get low stock items:**
-```sql
-SELECT * FROM product 
-WHERE stock_quantity > 0 AND stock_quantity < 10;
-```
-
 ## Design Decisions
 
 1. **Partial Indexes**: Used for `is_active = true` patterns to reduce index size and improve performance

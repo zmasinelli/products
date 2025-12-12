@@ -342,17 +342,42 @@ Indexes were designed based on query patterns identified in the API endpoints:
 
 ### Refactoring Priorities
 
-1. **Validation Layer**
+1. **Feature-Based Organization**
+   - **Current**: Flat structure organized by layer (Controllers/, Services/, Models/)
+   - **Improvement**: Organize by feature/domain (Products/, Categories/) with each feature containing its own Controllers, Services, and DTOs
+   - **Benefit**: Better scalability, easier to locate feature-specific code, clearer boundaries between features
+   - **Target Structure**:
+     ```
+     Products.Api/
+     ├── Core/
+     │   ├── Domain/ (Product.cs, Category.cs)
+     │   ├── Data/ (ApplicationDbContext, DataSeeder)
+     │   ├── Middleware/ (GlobalExceptionHandlerMiddleware)
+     │   └── Extensions/ (ServiceCollectionExtensions, etc.)
+     ├── Features/
+     │   ├── Products/
+     │   │   ├── Controllers/ (ProductsController)
+     │   │   ├── Services/ (ProductService, IProductService)
+     │   │   └── DTOs/ (ProductDto, CreateProductDto, UpdateProductDto)
+     │   └── Categories/
+     │       ├── Controllers/ (CategoriesController)
+     │       ├── Services/ (CategoryService, ICategoryService)
+     │       └── DTOs/ (CategoryDto, CreateCategoryDto, UpdateCategoryDto)
+     └── Shared/
+         └── DTOs/ (ErrorResponseDto)
+     ```
+
+2. **Validation Layer**
    - **Current**: Validation attributes on DTOs + manual checks in services
    - **Improvement**: Extract validation logic to FluentValidation or dedicated validators
    - **Benefit**: Centralized, testable validation rules
 
-2. **Mapping Layer**
+3. **Mapping Layer**
    - **Current**: Manual DTO mapping in services
    - **Improvement**: Use AutoMapper or Mapster for entity ↔ DTO mapping
    - **Benefit**: Reduces boilerplate, easier to maintain
 
-3. **Result Pattern**
+4. **Result Pattern**
    - **Current**: Services return DTOs or throw exceptions
    - **Improvement**: Implement Result<T> pattern for explicit error handling
    - **Benefit**: Makes error cases explicit in method signatures
@@ -391,7 +416,7 @@ Indexes were designed based on query patterns identified in the API endpoints:
    }
    ```
 
-4. **Specification Pattern**
+5. **Specification Pattern**
    - **Current**: Query building logic in service methods
    - **Improvement**: Extract query specifications to separate classes
    - **Benefit**: Reusable, testable query logic
@@ -456,11 +481,11 @@ Indexes were designed based on query patterns identified in the API endpoints:
    }
    ```
 
-5. **Unit Tests**
+6. **Unit Tests**
    - **Priority**: Add comprehensive unit tests for services using in-memory database
    - **Coverage**: Test all business logic, edge cases, and error scenarios
 
-6. **Integration Tests**
+7. **Integration Tests**
    - **Priority**: Add API integration tests using TestServer
    - **Coverage**: Test all endpoints with various scenarios
 

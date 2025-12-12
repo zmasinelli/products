@@ -206,7 +206,7 @@ public class ProductService : IProductService
     public async Task<bool> UpdateProductAsync(int id, UpdateProductDto updateDto)
     {
         var product = await _context.Products
-            .FirstOrDefaultAsync(p => p.Id == id);
+            .FirstOrDefaultAsync(p => p.Id == id && p.IsActive);
 
         if (product == null)
         {

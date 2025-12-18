@@ -15,3 +15,4 @@ export interface UpdateCategoryRequest {
   description?: string | null;
   isActive?: boolean;
 }
+

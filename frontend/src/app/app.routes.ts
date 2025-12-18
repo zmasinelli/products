@@ -17,3 +17,4 @@ export const routes: Routes = [
   { path: 'categories/new', component: CategoryCreateComponent },
   { path: 'categories/:id/edit', component: CategoryEditComponent }
 ];
+

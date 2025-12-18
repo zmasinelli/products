@@ -44,3 +44,4 @@ Default development API URL: `http://localhost:5292`
 - Loading states
 - Responsive design
 - Accessibility support
+

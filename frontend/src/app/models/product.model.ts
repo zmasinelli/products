@@ -34,3 +34,4 @@ export interface UpdateProductRequest {
   stockQuantity?: number;
   isActive?: boolean;
 }
+

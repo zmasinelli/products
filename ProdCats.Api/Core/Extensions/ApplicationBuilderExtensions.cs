@@ -10,20 +10,22 @@ public static class ApplicationBuilderExtensions
         if (environment.IsDevelopment())
         {
             app.UseSwagger();
-            app.UseSwaggerUI();
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "ProdCats API v1");
+                c.RoutePrefix = "swagger";
+            });
         }
         else
         {
             app.UseHttpsRedirection();
         }
 
-        // CORS middleware (must be before UseAuthorization)
+        // CORS middleware
         app.UseCors("AngularApp");
 
         // Global exception handling middleware (must be early in pipeline)
         app.UseMiddleware<GlobalExceptionHandlerMiddleware>();
-
-        app.UseAuthorization();
 
         app.MapControllers();
 

@@ -3,3 +3,4 @@ export interface ErrorResponse {
   details?: string;
   errors?: Record<string, string[]>;
 }
+

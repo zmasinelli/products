@@ -70,7 +70,7 @@ docker-compose down -v
    dotnet run
    ```
 
-The API will be available at `http://localhost:5000` (or the port shown in the console). Swagger UI is available at `http://localhost:5000/swagger` in development mode.
+The API will be available at `http://localhost:5000` (or the port shown in the console). Swagger UI is available at `http://localhost:5292/swagger` in development mode.
 
 The database will be automatically seeded with sample data on first run.
 

@@ -1,3 +1,4 @@
+using Microsoft.OpenApi.Models;
 using ProdCats.Api.Core.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -5,7 +6,15 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Title = "ProdCats API",
+        Version = "v1",
+        Description = "API for managing products and categories"
+    });
+});
 
 // Configure application services, database, and CORS
 builder.Services.AddApplicationServices();
